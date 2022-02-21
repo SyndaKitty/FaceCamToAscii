@@ -1,7 +1,8 @@
 # FaceCamToAscii
-Converts webcam video to an ASCII representation
+Converts webcam video to an ASCII representation.
+Uses OpenCV to track a face and keep it centered
 
-Must have OpenCV installed
+Must have OpenCV installed to run
 
 Usage:
 ```python
