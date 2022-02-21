@@ -1,17 +1,56 @@
 import cv2
 import sys
 
-vid = cv2.VideoCapture(int(sys.argv[1]))
-detector = cv2.CascadeClassifier('haarcascade_frontalface_alt2.xml')
+def handle_input():
+    global threshold
+    global setting
 
-last_face_threshold = 80
-last_face_x = None
-last_face_y = None
+    key = cv2.waitKey(50)
+    if key == ord('1'):
+        setting = 1
+    if key == ord('2'):
+        setting = 2
+    if key == ord('3'):
+        setting = 3
+    if key == ord('w'):
+        threshold += 1
+        update_intensity_map()
+    if key == ord('s'):
+        threshold = max(threshold-1, 0)
+        update_intensity_map()
+    return key
+
+def update_intensity_map():
+    global intensity_map
+    intensity_map = intensity_map_def
+    for i in range(threshold):
+        intensity_map += ' '
+
+
+# -- Settings --
 
 # Settings 1: Close View 90 -> 50, 50
 # Settings 2: Wide View: 150 -> 50, 50
 # Settings 3: Fullscreen 2000 -> 70, 50
 setting = 2
+threshold = 17
+intensity_map = ''
+
+last_face_threshold = 80
+last_face_x = None
+last_face_y = None
+
+# intensity_map_def = '▓Ñ▒@#W░$9876543210?!abc;:+=-,._'
+# intensity_map_def = '▒Ñ@BW░#032|1:_-,.'
+intensity_map_def = '▓Ñ▒@W░321:-,.'
+
+update_intensity_map()
+
+
+
+# -- Start --
+vid = cv2.VideoCapture(int(sys.argv[1]))
+detector = cv2.CascadeClassifier('haarcascade_frontalface_alt2.xml')
 
 while vid.isOpened():
     ret, frame = vid.read()
@@ -47,15 +86,9 @@ while vid.isOpened():
         delta = abs(last_face_x - m_x) + abs(last_face_y - m_y)
         if delta > last_face_threshold:
             cv2.imshow('frame', final_frame)
-            key = cv2.waitKey(50)
+            key = handle_input()
             if key == ord('q'):
                 break
-            if key == ord('1'):
-                setting = 1
-            if key == ord('2'):
-                setting = 2
-            if key == ord('3'):
-                setting = 3
             if key != 13: # Enter
                 continue # Face is too far away this frame, ignore
         
@@ -80,10 +113,6 @@ while vid.isOpened():
     cv2.imshow('frame', frame)
     img_height, img_width, channels = frame.shape
 
-    # vals = '▓Ñ▒@#W░$9876543210?!abc;:+=-,._         '
-    # vals = '▒Ñ@BW░#032|1:_-,.                 '
-    vals = '▓Ñ▒@W░321:-,.                 '
-
     max_int = 0
     min_int = 1
     for i in range(img_height):
@@ -100,17 +129,11 @@ while vid.isOpened():
             k = frame[i,j]
             avg = (int(k[0]) + int(k[1]) + int(k[2])) / (3.0 * 255)
             avg = (avg - min_int) / (max_int - min_int)
-            val = max(0, len(vals) - int(avg * len(vals)) - 1)
-            msg += vals[val] + vals[val]
+            val = max(0, len(intensity_map) - int(avg * len(intensity_map)) - 1)
+            msg += intensity_map[val] + intensity_map[val]
         msg += '\n'
     print(msg)
 
-    key = cv2.waitKey(50)
+    key = handle_input()
     if key == ord('q'):
         break
-    if key == ord('1'):
-        setting = 1
-    if key == ord('2'):
-        setting = 2
-    if key == ord('3'):
-        setting = 3
