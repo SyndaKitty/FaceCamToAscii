@@ -8,7 +8,7 @@ last_face_threshold = 80
 last_face_x = None
 last_face_y = None
 
-# Settings 1: Close View 80 -> 50, 50
+# Settings 1: Close View 90 -> 50, 50
 # Settings 2: Wide View: 150 -> 50, 50
 # Settings 3: Fullscreen 2000 -> 70, 50
 setting = 2
@@ -34,7 +34,7 @@ while vid.isOpened():
         (x,y,w,d) = face
 
         if setting == 1:
-            r = 80
+            r = 90
         elif setting == 2:
             r = 150
         
@@ -81,6 +81,7 @@ while vid.isOpened():
     img_height, img_width, channels = frame.shape
 
     # vals = '▓Ñ▒@#W░$9876543210?!abc;:+=-,._         '
+    # vals = '▒Ñ@BW░#032|1:_-,.                 '
     vals = '▓Ñ▒@W░321:-,.                 '
 
     max_int = 0
